@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -23,6 +24,8 @@ public class SeleniumTest {
 	private String cardLocator = ".//*[@id='board']/div[1]/div/div[2]/a[*]/div[*]/span[contains(.,'%s')]";
 	private String username= "";
 	private String password = "";
+	private String cardName = "";
+	private String boardName = "";
 
 
 	@BeforeClass
@@ -36,8 +39,16 @@ public class SeleniumTest {
 		driver.quit();
 	}
 
-	@Test
-	public void test()  {
+	@DataProvider(name = "dataProvider")
+	public Object[][] dataProvider(){
+		return new Object[][] {
+				{boardName, cardName}
+
+		};
+	}
+
+	@Test(dataProvider = "dataProvider")
+	public void uiTestWithRestAssuredSetup(String boardName, String cardName)  {
 		//Open login page
 		driver.get("https://trello.com/login");
 		//Populate username
@@ -49,16 +60,10 @@ public class SeleniumTest {
 		//Wait for page to be loaded
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		//Verify if new board was added by rest assured setup.
-		assert (driver.findElement(new By.ByXPath(String.format(boardLocator, "new board"))).getText().equals("new board"));
+		assert (driver.findElement(new By.ByXPath(String.format(boardLocator, boardName))).getText().equals(boardName));
 		//Go to new board
-		driver.findElement(new By.ByXPath(String.format(boardLocator, "new board"))).click();
+		driver.findElement(new By.ByXPath(String.format(boardLocator, boardName))).click();
 		//Check if card was added by rest assured setup.
-		assert (driver.findElement(new By.ByXPath(String.format(cardLocator, "test1"))).getText().equals("test1"));
-
-
-
-
-
-
+		assert (driver.findElement(new By.ByXPath(String.format(cardLocator, cardName))).getText().equals(cardName));
 	}
 }
